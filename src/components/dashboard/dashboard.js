@@ -7,7 +7,8 @@ import Avatar from 'material-ui/Avatar';
 import AppBar from 'material-ui/AppBar';
 import {purple500} from 'material-ui/styles/colors';
 import {Tabs, Tab} from 'material-ui/Tabs';
-import Slider from 'material-ui/Slider';
+import {GridList, GridTile} from 'material-ui/GridList';
+
 
 class Dashboard extends Component {
 
@@ -40,43 +41,33 @@ class Dashboard extends Component {
         return (
             <div>
                 <AppBar title='Dashboard'/>
-                {/*<List>*/}
-                {/*{this.state.usersData.map((data) => {*/}
-                {/*console.log(data);*/}
-                {/*return (*/}
-                {/*<div>*/}
-                {/*<ListItem key={data.id}*/}
-                {/*disabled={true}*/}
-                {/*leftAvatar={<Avatar>{data.name[0]}</Avatar>}*/}
-                {/*backgroundColor={purple500}>*/}
-                {/*{data.name}*/}
-                {/*</ListItem>*/}
-                {/*</div>*/}
-                {/*)*/}
-                {/*})}*/}
-                {/*</List>*/}
-                <Tabs>
-                    <Tab label="Item One">
-                        <List>
-                        {this.state.usersData.map((data) => {
-                        console.log(data);
-                        return (
-                        <div>
-                        <ListItem key={data.id}
-                        disabled={true}
-                        leftAvatar={<Avatar>{data.name[0]}</Avatar>}
-                        backgroundColor={purple500}>
-                        {data.name}
-                        </ListItem>
-                        </div>
-                        )
-                        })}
-                        </List>
-                    </Tab>
-                    <Tab label="Item Two">
-                        fsdfsdf
-                    </Tab>
-                </Tabs>
+                <GridList cols={12} cellHeight='auto'>
+                    <GridTile cols={3}>
+                        <Tabs>
+                            <Tab label="Item One">
+                                <List>
+                                    {this.state.usersData.map((data) => {
+                                        console.log(data);
+                                        return (
+                                            <div>
+                                                <ListItem key={data.id} disabled={true} leftAvatar={<Avatar>{data.name[0]}</Avatar>}>
+                                                    {data.name}
+                                                </ListItem>
+                                            </div>
+                                        )
+                                    })}
+                                </List>
+                            </Tab>
+                            <Tab label="Item Two">
+                                fsdfsdf
+                            </Tab>
+                        </Tabs>
+                    </GridTile>
+                    <GridTile  cols={9}>
+                        sasdasdd
+                    </GridTile>
+                </GridList>
+
             </div>
         )
     }
