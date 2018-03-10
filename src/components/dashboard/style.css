@@ -1,0 +1,9 @@
+.input {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.card {
+    margin: 15px 50px 0 50px;
+}

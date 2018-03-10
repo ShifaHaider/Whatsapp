@@ -24,7 +24,7 @@ class Login extends Component {
     loginAccount() {
         firebase.auth().signInWithEmailAndPassword(this.state.loginData.logEmail, this.state.loginData.logPassword)
             .then((data) => {
-                // console.log(localStorage.setItem('Id', data.uid));
+             localStorage.setItem('Id', data.uid);
                 this.props.history.push('/dashboard');
 
             })

@@ -1,21 +1,24 @@
 import React, {Component} from 'react';
 import firebase from 'firebase'
 import firestore from 'firebase/firestore'
-import App from "../../App";
 import {List, ListItem} from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
 import AppBar from 'material-ui/AppBar';
-import {purple500} from 'material-ui/styles/colors';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import {GridList, GridTile} from 'material-ui/GridList';
-
+import TextField from 'material-ui/TextField';
+import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
+import './style.css'
+import MobileTearSheet from '../MobileTearSheet/mobile-tear-sheet';
+import Room from '../room/room'
 
 class Dashboard extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            usersData: []
+            usersData: [],
+            anotherUser: {}
         };
 
         this.db = firebase.firestore();
@@ -24,18 +27,20 @@ class Dashboard extends Component {
 
     loadUsersName() {
         this.db.collection('Users').get().then((users) => {
-                console.log(users);
                 users.forEach((userName) => {
                     var data = userName.data();
                     var arr = this.state.usersData;
                     arr.push(data);
                     this.setState({usersData: arr})
                 });
-                console.log(this.state.usersData);
             }
         )
     }
 
+    setData(data) {
+        this.setState({anotherUser:data});
+
+    }
 
     render() {
         return (
@@ -44,30 +49,29 @@ class Dashboard extends Component {
                 <GridList cols={12} cellHeight='auto'>
                     <GridTile cols={3}>
                         <Tabs>
-                            <Tab label="Item One">
-                                <List>
-                                    {this.state.usersData.map((data) => {
-                                        console.log(data);
-                                        return (
-                                            <div>
-                                                <ListItem key={data.id} disabled={true} leftAvatar={<Avatar>{data.name[0]}</Avatar>}>
+                            <Tab label="Contact">
+                                <MobileTearSheet>
+                                    <List>
+                                        {this.state.usersData.map((data) => {
+                                            return (
+                                                <ListItem key={data.id} disabled={true}
+                                                          leftAvatar={<Avatar onClick={this.setData.bind(this, data)}>{data.name[0]}</Avatar>}>
                                                     {data.name}
                                                 </ListItem>
-                                            </div>
-                                        )
-                                    })}
-                                </List>
+                                            )
+                                        })}
+                                    </List>
+                                </MobileTearSheet>
                             </Tab>
-                            <Tab label="Item Two">
-                                fsdfsdf
+                            <Tab label="Chat">
+                                <TextField hintText="Hint Text"/>
                             </Tab>
                         </Tabs>
                     </GridTile>
-                    <GridTile  cols={9}>
-                        sasdasdd
+                    <GridTile cols={9}>
+                        <Room anotherUser={this.state.anotherUser}/>
                     </GridTile>
                 </GridList>
-
             </div>
         )
     }
