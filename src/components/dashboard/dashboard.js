@@ -29,22 +29,6 @@ class Dashboard extends Component {
 
     }
 
-    loadUsersName() {
-        this.db.collection('Users').get().then((users) => {
-                users.forEach((userName) => {
-                    var data = userName.data();
-                    var arr = this.state.usersData;
-                    arr.push(data);
-                    this.setState({usersData: arr})
-                });
-            }
-        )
-    }
-
-    setData(data) {
-        this.setState({anotherUser: data});
-    }
-
     componentWillMount() {
         this.db = firebase.firestore();
         this.usersDB = this.db.collection('Users');
@@ -54,6 +38,7 @@ class Dashboard extends Component {
 
     }
 
+
     loadRooms() {
         var arr = [];
         window.Room ? window.Room() : null;
@@ -62,17 +47,36 @@ class Dashboard extends Component {
                 var r = room.doc.data();
                 r.id = room.doc.id;
                 if (room.type == 'added') {
-                    var fid  = this.userId;
+                    var fid = this.userId;
                     for (var id in r.users) id != this.userId ? fid = id : null;
                     r.refs[fid].get().then((doc) => {
                         r.friend = doc.data();
                         r.friend.id = doc.id;
+
                         arr.push(r);
                         this.setState({rooms: arr})
                     })
                 }
             })
         });
+    }
+
+    loadUsersName() {
+        this.db.collection('Users').get().then((users) => {
+                users.forEach((userName) => {
+                    var data = userName.data();
+                    if (data.id != this.userId) {
+                        var arr = this.state.usersData;
+                        arr.push(data);
+                        this.setState({usersData: arr})
+                    }
+                });
+            }
+        )
+    }
+
+    setData(data) {
+        this.setState({anotherUser: data});
     }
 
     roomData(rData) {
@@ -86,18 +90,16 @@ class Dashboard extends Component {
                     <GridTile cols={3}>
                         <Tabs>
                             <Tab label="Contact">
-                                <MobileTearSheet>
-                                    <List>
-                                        {this.state.usersData.map((data) => {
-                                            return (
-                                                <ListItem key={data.id} disabled={true} leftAvatar={<Avatar
-                                                    onClick={this.setData.bind(this, data)}>{data.name[0]}</Avatar>}>
-                                                    {data.name}
-                                                </ListItem>
-                                            )
-                                        })}
-                                    </List>
-                                </MobileTearSheet>
+                                <List>
+                                    {this.state.usersData.map((data) => {
+                                        return (
+                                            <ListItem onClick={this.setData.bind(this, data)} key={data.id}
+                                                      leftAvatar={<Avatar>{data.name[0]}</Avatar>}>
+                                                {data.name}
+                                            </ListItem>
+                                        )
+                                    })}
+                                </List>
                             </Tab>
                             <Tab label="Chat">
                                 <List>
@@ -117,7 +119,7 @@ class Dashboard extends Component {
                         </Tabs>
                     </GridTile>
                     <GridTile cols={9}>
-                        <Room anotherUser={this.state.anotherUser}/>
+                        {this.state.anotherUser.id ? <Room anotherUser={this.state.anotherUser}/> : <h1>Hello</h1>}
                     </GridTile>
                 </GridList>
             </div>

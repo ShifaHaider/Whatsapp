@@ -118,15 +118,13 @@ class Room extends Component {
                     <List>
                         {this.state.messages.map((data) => {
                             return (
-                                <ListItem key={data.id} disabled={true}
-                                          primaryText={data.text} secondaryText={new Date(data.time).toLocaleString()}>
-                                </ListItem>
+                                <ListItem key={data.id} primaryText={data.text} secondaryText={new Date(data.time).toLocaleString()}></ListItem>
                             )
                         })}
                     </List>
                 </Card>
 
-                <div className='input'>
+                <div className='input' >
                     <TextField hintText="Type a Message" fullWidth={true} multiLine={true} rows={1}
                                value={this.state.message} onChange={this.handleChange.bind(this)}/>
                     <FlatButton label="Default" onClick={this.addMessages.bind(this)}/>
