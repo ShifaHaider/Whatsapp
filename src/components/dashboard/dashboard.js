@@ -11,6 +11,8 @@ import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import './style.css'
 import MobileTearSheet from '../MobileTearSheet/mobile-tear-sheet';
 import Room from '../room/room'
+import ContentSend from 'material-ui/svg-icons/content/send';
+import FileFolder from 'material-ui/svg-icons/file/folder';
 
 class Dashboard extends Component {
 
@@ -18,11 +20,13 @@ class Dashboard extends Component {
         super(props);
         this.state = {
             usersData: [],
-            anotherUser: {}
+            anotherUser: {},
+            rooms: []
         };
-
         this.db = firebase.firestore();
         this.loadUsersName();
+        // this.loadRooms();
+
     }
 
     loadUsersName() {
@@ -38,8 +42,40 @@ class Dashboard extends Component {
     }
 
     setData(data) {
-        this.setState({anotherUser:data});
+        this.setState({anotherUser: data});
+    }
 
+    componentWillMount() {
+        this.db = firebase.firestore();
+        this.usersDB = this.db.collection('Users');
+        this.roomsDB = this.db.collection('Rooms');
+        this.userId = localStorage.getItem('Id');
+        this.loadRooms();
+
+    }
+
+    loadRooms() {
+        var arr = [];
+        window.Room ? window.Room() : null;
+        window.Room = this.roomsDB.where('users.' + this.userId, '==', true).onSnapshot((rooms) => {
+            rooms.docChanges.forEach((room) => {
+                var r = room.doc.data();
+                r.id = room.doc.id;
+                if (room.type == 'added') {
+                    var fid  = this.userId;
+                    for (var id in r.users) id != this.userId ? fid = id : null;
+                    r.refs[fid].get().then((doc) => {
+                        r.friend = doc.data();
+                        r.friend.id = doc.id;
+                        arr.push(r);
+                        this.setState({rooms: arr})
+                    })
+                }
+            })
+        });
+    }
+
+    roomData(rData) {
     }
 
     render() {
@@ -54,8 +90,8 @@ class Dashboard extends Component {
                                     <List>
                                         {this.state.usersData.map((data) => {
                                             return (
-                                                <ListItem key={data.id} disabled={true}
-                                                          leftAvatar={<Avatar onClick={this.setData.bind(this, data)}>{data.name[0]}</Avatar>}>
+                                                <ListItem key={data.id} disabled={true} leftAvatar={<Avatar
+                                                    onClick={this.setData.bind(this, data)}>{data.name[0]}</Avatar>}>
                                                     {data.name}
                                                 </ListItem>
                                             )
@@ -64,7 +100,19 @@ class Dashboard extends Component {
                                 </MobileTearSheet>
                             </Tab>
                             <Tab label="Chat">
-                                <TextField hintText="Hint Text"/>
+                                <List>
+                                    {this.state.rooms.map((data) => {
+                                        return (
+                                            <ListItem key={data.id} disabled={true}
+                                                      leftAvatar={<Avatar
+                                                          onClick={this.roomData.bind(this, data.friend)}
+                                                          icon={<FileFolder/>}/>}
+                                                      primaryText={data.friend.name}
+                                                      secondaryText={data.lastMsg.text + new Date(data.lastMsg.time).toLocaleString()}>
+                                            </ListItem>
+                                        )
+                                    })}
+                                </List>
                             </Tab>
                         </Tabs>
                     </GridTile>
