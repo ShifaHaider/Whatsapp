@@ -107,9 +107,7 @@ class Dashboard extends Component {
                                         return (
                                             <ListItem key={data.id} disabled={true}
                                                       leftAvatar={<Avatar
-                                                          onClick={this.roomData.bind(this, data.friend)}
-                                                          icon={<FileFolder/>}/>}
-                                                      primaryText={data.friend.name}
+                                                      onClick={this.roomData.bind(this, data.friend)} icon={<FileFolder/>}/>} primaryText={data.friend.name}
                                                       secondaryText={data.lastMsg.text + new Date(data.lastMsg.time).toLocaleString()}>
                                             </ListItem>
                                         )

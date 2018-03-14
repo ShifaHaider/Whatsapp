@@ -4,13 +4,10 @@ import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import firebase from 'firebase'
 import firestore from 'firebase/firestore'
 import {List, ListItem} from 'material-ui/List';
-import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
-import Subheader from 'material-ui/Subheader';
 import Avatar from 'material-ui/Avatar';
 
-import ContentSend from 'material-ui/svg-icons/content/send';
-
+import './style.css'
 
 class Room extends Component {
     constructor(props) {
@@ -19,11 +16,12 @@ class Room extends Component {
             room: {},
             messages: [],
             message: '',
-            anotherUser: {}
+            anotherUser: {},
+            fileURL: ''
         };
     }
 
-    componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps(nextProps) {
         console.log(nextProps);
         this.setState({anotherUser: nextProps.anotherUser});
         this.db = firebase.firestore();
@@ -58,7 +56,10 @@ class Room extends Component {
             text: this.state.message,
             time: Date.now(),
             senderId: id,
-            roomId: this.state.room.id
+            roomId: this.state.room.id,
+            fileURL: this.state.fileURL || null,
+            fileType: this.state.fileType
+
         })
     }
 
@@ -106,6 +107,18 @@ class Room extends Component {
         this.setState({message: e.target.value});
     }
 
+    uploadFile(input) {
+        var file = input.target.files[0];
+        console.log(file);
+        var event = firebase.storage().ref().child(file.name).put(file);
+        event.then((snapshot) => {
+            console.log(snapshot);
+            var fileURL = snapshot.downloadURL;
+            this.setState({fileURL: fileURL, fileType: file.type});
+            console.log(this.state);
+        })
+    }
+
     render() {
         return (
             <div>
@@ -118,16 +131,19 @@ class Room extends Component {
                     <List>
                         {this.state.messages.map((data) => {
                             return (
-                                <ListItem key={data.id} primaryText={data.text} secondaryText={new Date(data.time).toLocaleString()}></ListItem>
+                                <ListItem key={data.id} primaryText={data.text}
+                                          secondaryText={new Date(data.time).toLocaleString()}>
+                                    <img src={data.fileURL} alt=""/>
+                                </ListItem>
                             )
                         })}
                     </List>
                 </Card>
-
-                <div className='input' >
-                    <TextField hintText="Type a Message" fullWidth={true} multiLine={true} rows={1}
+                <input type="file" onChange={this.uploadFile.bind(this)}/>
+                <div className='input'>
+                    <TextField className='inp' hintText="Type a Message" fullWidth={true} multiLine={true} rows={1}
                                value={this.state.message} onChange={this.handleChange.bind(this)}/>
-                    <FlatButton label="Default" onClick={this.addMessages.bind(this)}/>
+                    <FlatButton label="Send" onClick={this.addMessages.bind(this)}/>
                 </div>
             </div>
         )

@@ -9,7 +9,6 @@ import Account from "./components/create-account/create-account";
 import Login from "./components/login/login";
 import Dashboard from "./components/dashboard/dashboard";
 
-
 var config = {
     apiKey: "AIzaSyDE-xiJYHnsJELOJmNW_M9LrGbITKv6YBY",
     authDomain: "whatsapp-c9cc7.firebaseapp.com",
