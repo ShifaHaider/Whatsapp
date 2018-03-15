@@ -50,32 +50,6 @@ class Room extends Component {
     }
 
 
-    addMessages() {
-        var id = localStorage.getItem('Id');
-        this.roomsDB.doc(this.state.room.id).collection('Messages').add({
-            text: this.state.message,
-            time: Date.now(),
-            senderId: id,
-            roomId: this.state.room.id,
-            fileURL: this.state.fileURL || null,
-            fileType: this.state.fileType
-
-        })
-    }
-
-    loadMessages() {
-        var data = [];
-        window.Message ? window.Message() : null;
-        window.Message = this.roomsDB.doc(this.state.room.id).collection('Messages').onSnapshot((msgsData) => {
-            msgsData.docChanges.forEach((msgData) => {
-                var msg = msgData.doc.data();
-                msg.id = msgData.doc.id;
-                data.push(msg);
-                this.setState({messages: data})
-            })
-        })
-    }
-
     createRoom() {
         var ref = this.db.collection('Rooms').doc();
         var o = {
@@ -103,18 +77,58 @@ class Room extends Component {
         })
     }
 
+    addMessages() {
+        var id = localStorage.getItem('Id');
+        console.log(this.state);
+        this.roomsDB.doc(this.state.room.id).collection('Messages').add({
+            text: this.state.message,
+            time: Date.now(),
+            senderId: id,
+            roomId: this.state.room.id,
+            fileURL: this.state.fileURL || null,
+            fileType: this.state.fileType || null
+
+        })
+    }
+
+    loadMessages() {
+        var data = [];
+        window.Message ? window.Message() : null;
+        window.Message = this.roomsDB.doc(this.state.room.id).collection('Messages').onSnapshot((msgsData) => {
+            msgsData.docChanges.forEach((msgData) => {
+                var msg = msgData.doc.data();
+                msg.id = msgData.doc.id;
+                data.push(msg);
+                this.setState({messages: data})
+            })
+        })
+    }
+
+
     handleChange(e) {
         this.setState({message: e.target.value});
     }
 
     uploadFile(input) {
         var file = input.target.files[0];
-        console.log(file);
+        var fileName = file.name.split('.');
+        var fileExtension = fileName[fileName.length - 1].toLocaleLowerCase();
+        var fileType = '';
+        if (['jpg', 'gif', 'bmp', 'png', 'jpeg'].indexOf(fileExtension) != -1) {
+            fileType = 'image';
+        }
+        else if (['m4v', 'avi', 'mpg', 'mp4', 'webm','wmv'].indexOf(fileExtension) != -1) {
+            fileType = 'video';
+        }
+        else {
+            fileType = 'file';
+        }
+        console.log(fileType);
         var event = firebase.storage().ref().child(file.name).put(file);
         event.then((snapshot) => {
             console.log(snapshot);
             var fileURL = snapshot.downloadURL;
-            this.setState({fileURL: fileURL, fileType: file.type});
+            this.setState({fileURL: fileURL, fileType: fileType});
             console.log(this.state);
         })
     }
@@ -133,7 +147,11 @@ class Room extends Component {
                             return (
                                 <ListItem key={data.id} primaryText={data.text}
                                           secondaryText={new Date(data.time).toLocaleString()}>
-                                    <img src={data.fileURL} alt=""/>
+                                    {data.fileType == 'image' ? <img src={data.fileURL}/> : ''}
+                                    {console.log(data.fileURL)}
+                                    {data.fileType == 'video' ? <video width='320' height='240' controls><source src={data.fileURL}/></video> : ''}
+                                    {data.fileType == 'file' ? <img src={data.fileURL}/> : ''}
+
                                 </ListItem>
                             )
                         })}

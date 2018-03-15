@@ -105,9 +105,7 @@ class Dashboard extends Component {
                                 <List>
                                     {this.state.rooms.map((data) => {
                                         return (
-                                            <ListItem key={data.id} disabled={true}
-                                                      leftAvatar={<Avatar
-                                                      onClick={this.roomData.bind(this, data.friend)} icon={<FileFolder/>}/>} primaryText={data.friend.name}
+                                            <ListItem key={data.id} leftAvatar={<Avatar onClick={this.roomData.bind(this, data.friend)} icon={<FileFolder/>}/>} primaryText={data.friend.name}
                                                       secondaryText={data.lastMsg.text + new Date(data.lastMsg.time).toLocaleString()}>
                                             </ListItem>
                                         )
