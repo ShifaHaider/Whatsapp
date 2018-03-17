@@ -24,13 +24,67 @@ class Login extends Component {
     loginAccount() {
         firebase.auth().signInWithEmailAndPassword(this.state.loginData.logEmail, this.state.loginData.logPassword)
             .then((data) => {
-             localStorage.setItem('Id', data.uid);
+                localStorage.setItem('Id', data.uid);
                 this.props.history.push('/dashboard');
 
             })
             .catch((error) => {
                 this.setState({message: error.message, isAlertOpen: true});
             });
+    }
+
+    loginGoogle() {
+        var provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('https://www.googleapis.com/auth/plus.login');
+        firebase.auth().signInWithPopup(provider).then((result) => {
+            console.log(result);
+            var profile = result.additionalUserInfo.profile;
+            console.log(profile);
+            var data = {};
+            data.name = profile.name;
+            data.email = profile.email;
+            data.id = result.user.uid;
+            this.checkAccount(data);
+        }).catch((function (error) {
+                console.log(error);
+            })
+        )
+    }
+
+    loginFacebook() {
+        var provider = new firebase.auth.FacebookAuthProvider();
+        firebase.auth().signInWithPopup(provider).then((result) => {
+            console.log(result);
+            var data = {};
+            data.name = result.additionalUserInfo.profile.name;
+            data.email = result.additionalUserInfo.profile.email || '';
+            data.phone = result.additionalUserInfo.profile.phone || '';
+            data.id = result.user.uid;
+            console.log(data);
+            this.checkAccount(data);
+        })
+    }
+
+    checkAccount(data) {
+        var db = firebase.firestore();
+        db.collection('Users').doc(data.id).get().then((userData) => {
+            console.log(userData);
+            if(userData.exists){
+                localStorage.setItem('userId' , data.id);
+                this.props.history.push('/dashboard');
+            }
+            else {
+                db.collection('Users').doc(data.id).set(data).then(()=>{
+                    localStorage.setItem('userId' , data.id);
+                    this.props.history.push('/dashboard');
+                })
+
+
+
+            }
+        });
+        console.log(data);
+
     }
 
     handleChangeLog(p, e) {
@@ -40,14 +94,12 @@ class Login extends Component {
     }
 
     createAccount() {
-        console.log(this.props);
         this.props.history.push('/account')
     }
 
     close() {
         this.setState({isAlertOpen: false});
     }
-
 
 
     render() {
@@ -67,7 +119,9 @@ class Login extends Component {
                     value={this.state.loginData.logPassword}
                     onChange={this.handleChangeLog.bind(this, 'logPassword')}/><br/>
                 <RaisedButton label='Login' secondary={true} onClick={this.loginAccount.bind(this)}/><br/><br/>
-                <RaisedButton label='Create Account' primary={true} onClick={this.createAccount.bind(this)}/>
+                <RaisedButton label='Create Account' primary={true} onClick={this.createAccount.bind(this)}/><br/><br/>
+                <RaisedButton label='Login Google' primary={true} onClick={this.loginGoogle.bind(this)}/><br/><br/>
+                <RaisedButton label='Login Facebook' primary={true} onClick={this.loginFacebook.bind(this)}/>
 
 
                 <Dialog

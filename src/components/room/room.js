@@ -157,12 +157,14 @@ class Room extends Component {
                         })}
                     </List>
                 </Card>
-                <input type="file" onChange={this.uploadFile.bind(this)}/>
+
                 <div className='input'>
-                    <TextField className='inp' hintText="Type a Message" fullWidth={true} multiLine={true} rows={1}
+                    <TextField className='inp' hintText="Type a Message"  multiLine={true} rows={1}
                                value={this.state.message} onChange={this.handleChange.bind(this)}/>
+
                     <FlatButton label="Send" onClick={this.addMessages.bind(this)}/>
-                </div>
+                    <input type="file" onChange={this.uploadFile.bind(this)}/>
+            </div>
             </div>
         )
     }

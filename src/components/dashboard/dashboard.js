@@ -30,6 +30,7 @@ class Dashboard extends Component {
     }
 
     componentWillMount() {
+        console.log(this.props);
         this.db = firebase.firestore();
         this.usersDB = this.db.collection('Users');
         this.roomsDB = this.db.collection('Rooms');
@@ -102,6 +103,7 @@ class Dashboard extends Component {
                                 </List>
                             </Tab>
                             <Tab label="Chat">
+
                                 <List>
                                     {this.state.rooms.map((data) => {
                                         return (
@@ -113,9 +115,12 @@ class Dashboard extends Component {
                                 </List>
                             </Tab>
                         </Tabs>
+                        {/*<input type="file" className='i'/>*/}
                     </GridTile>
                     <GridTile cols={9}>
-                        {this.state.anotherUser.id ? <Room anotherUser={this.state.anotherUser}/> : <h1>Hello</h1>}
+                        {this.state.anotherUser.id ? <Room anotherUser={this.state.anotherUser}/> :
+                            <h1>Hello</h1>
+                        }
                     </GridTile>
                 </GridList>
             </div>

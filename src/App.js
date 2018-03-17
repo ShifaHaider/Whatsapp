@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
 import './App.css';
 import {Router, Route, Switch, Link} from 'react-router-dom'
 import createBrowserHistory from 'history/createBrowserHistory'
@@ -19,24 +18,25 @@ var config = {
 };
 firebase.initializeApp(config);
 const history = createBrowserHistory();
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-          <Router history={history}>
-              <div>
-                  <Switch>
-                      <Route exact path={'/'} component={Account}/>
-                      <Route exact path={'/account'} component={Account}/>
-                      <Route exact path={'/login'} component={Login}/>
-                      <Route exact path={'/dashboard'} component={Dashboard}/>
 
-                  </Switch>
-              </div>
-          </Router>
-      </div>
-    );
-  }
+class App extends Component {
+    render() {
+        return (
+            <div className="App">
+                <Router history={history}>
+                    <div>
+                        <Switch>
+
+                            <Route exact path={'/'} component={Account}/>
+                            <Route exact path={'/account'} component={Account}/>
+                            <Route exact path={'/login'} component={Login}/>
+                            <Route exact path={'/dashboard'} component={Dashboard}/>
+                        </Switch>
+                    </div>
+                </Router>
+            </div>
+        );
+    }
 }
 
 export default App;
