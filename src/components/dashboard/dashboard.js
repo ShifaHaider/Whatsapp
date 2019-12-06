@@ -30,13 +30,11 @@ class Dashboard extends Component {
     }
 
     componentWillMount() {
-        console.log(this.props);
         this.db = firebase.firestore();
         this.usersDB = this.db.collection('Users');
         this.roomsDB = this.db.collection('Rooms');
         this.userId = localStorage.getItem('Id');
         this.loadRooms();
-
     }
 
 
@@ -46,14 +44,13 @@ class Dashboard extends Component {
         window.Room = this.roomsDB.where('users.' + this.userId, '==', true).onSnapshot((rooms) => {
             rooms.docChanges.forEach((room) => {
                 var r = room.doc.data();
-                r.id = room.doc.id;
+                r.id = room.id;
                 if (room.type == 'added') {
                     var fid = this.userId;
                     for (var id in r.users) id != this.userId ? fid = id : null;
                     r.refs[fid].get().then((doc) => {
                         r.friend = doc.data();
-                        r.friend.id = doc.id;
-
+                        r.friend.id = doc.id ;
                         arr.push(r);
                         this.setState({rooms: arr})
                     })
@@ -81,9 +78,12 @@ class Dashboard extends Component {
     }
 
     roomData(rData) {
+        this.setState({anotherUser: rData.friend});
+
     }
 
     render() {
+        // console.log(this.state.room);
         return (
             <div>
                 <AppBar title='Dashboard'/>
@@ -94,7 +94,7 @@ class Dashboard extends Component {
                                 <List>
                                     {this.state.usersData.map((data) => {
                                         return (
-                                            <ListItem onClick={this.setData.bind(this, data)} key={data.id}
+                                                <ListItem onClick={this.setData.bind(this, data)} key={data.id}
                                                       leftAvatar={<Avatar>{data.name[0]}</Avatar>}>
                                                 {data.name}
                                             </ListItem>
@@ -107,19 +107,19 @@ class Dashboard extends Component {
                                 <List>
                                     {this.state.rooms.map((data) => {
                                         return (
-                                            <ListItem key={data.id} leftAvatar={<Avatar onClick={this.roomData.bind(this, data.friend)} icon={<FileFolder/>}/>} primaryText={data.friend.name}
-                                                      secondaryText={data.lastMsg.text + new Date(data.lastMsg.time).toLocaleString()}>
+                                             <ListItem key={data.lastMsg.time} leftAvatar={<Avatar onClick={this.roomData.bind(this, data.friend)} icon={<FileFolder/>}/>} primaryText={data.friend.name}
+                                                      secondaryText={data.lastMsg.text + new Date(data.lastMsg.time).toLocaleTimeString()}
+                                                       onClick={this.roomData.bind(this, data)}>
                                             </ListItem>
                                         )
                                     })}
                                 </List>
                             </Tab>
                         </Tabs>
-                        {/*<input type="file" className='i'/>*/}
                     </GridTile>
                     <GridTile cols={9}>
                         {this.state.anotherUser.id ? <Room anotherUser={this.state.anotherUser}/> :
-                            <h1>Hello</h1>
+                            <h1>Start Chat..</h1>
                         }
                     </GridTile>
                 </GridList>
@@ -129,3 +129,4 @@ class Dashboard extends Component {
 }
 
 export default Dashboard;
+

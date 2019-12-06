@@ -22,7 +22,6 @@ class Room extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps);
         this.setState({anotherUser: nextProps.anotherUser});
         this.db = firebase.firestore();
         this.usersDB = this.db.collection('Users');
@@ -66,7 +65,7 @@ class Room extends Component {
             },
             lastMsg: {
                 time: Date.now(),
-                text: 'New Message'
+                text: this.state.message
             }
 
         };
@@ -79,7 +78,7 @@ class Room extends Component {
 
     addMessages() {
         var id = localStorage.getItem('Id');
-        console.log(this.state);
+        {this.state.message ?
         this.roomsDB.doc(this.state.room.id).collection('Messages').add({
             text: this.state.message,
             time: Date.now(),
@@ -88,11 +87,13 @@ class Room extends Component {
             fileURL: this.state.fileURL || null,
             fileType: this.state.fileType || null
 
-        })
+        }): null}
+        this.setState({message : ""})
     }
 
     loadMessages() {
         var data = [];
+        this.setState({messages: data});
         window.Message ? window.Message() : null;
         window.Message = this.roomsDB.doc(this.state.room.id).collection('Messages').onSnapshot((msgsData) => {
             msgsData.docChanges.forEach((msgData) => {
@@ -123,13 +124,10 @@ class Room extends Component {
         else {
             fileType = 'file';
         }
-        console.log(fileType);
         var event = firebase.storage().ref().child(file.name).put(file);
         event.then((snapshot) => {
-            console.log(snapshot);
             var fileURL = snapshot.downloadURL;
             this.setState({fileURL: fileURL, fileType: fileType});
-            console.log(this.state);
         })
     }
 
@@ -141,14 +139,14 @@ class Room extends Component {
                         {this.state.anotherUser.name}
                     </ListItem>
                 </List>
+                {this.state.messages.length === 0 ? null :
                 <Card className='card'>
                     <List>
                         {this.state.messages.map((data) => {
                             return (
                                 <ListItem key={data.id} primaryText={data.text}
                                           secondaryText={new Date(data.time).toLocaleString()}>
-                                    {data.fileType == 'image' ? <img src={data.fileURL}/> : ''}
-                                    {console.log(data.fileURL)}
+                                    {data.fileType == 'image' ? <img src={data.fileURL} width='250' height='240'/> : ''}
                                     {data.fileType == 'video' ? <video width='320' height='240' controls><source src={data.fileURL}/></video> : ''}
                                     {data.fileType == 'file' ? <img src={data.fileURL}/> : ''}
 
@@ -156,7 +154,7 @@ class Room extends Component {
                             )
                         })}
                     </List>
-                </Card>
+                </Card>}
 
                 <div className='input'>
                     <TextField className='inp' hintText="Type a Message"  multiLine={true} rows={1}
